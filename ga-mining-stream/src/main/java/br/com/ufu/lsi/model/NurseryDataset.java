@@ -29,6 +29,8 @@ public class NurseryDataset {
     public static final List<String> decodedClasses;
     public static final List<String> encodedClasses;
     
+    public static final int datasetSize = 12960;
+    
     static {
         attributes = new HashMap<Integer,HashMap<String,String>>();
         decodedClasses = Arrays.asList( "not_recom", "recommended", "very_recom", "priority", "spec_prior" );
@@ -92,8 +94,6 @@ public class NurseryDataset {
         clazz.put( "priority", "00010" );
         clazz.put( "spec_prior", "00001" );
         attributes.put( 8, clazz );
-        
-        
     }
 
 }

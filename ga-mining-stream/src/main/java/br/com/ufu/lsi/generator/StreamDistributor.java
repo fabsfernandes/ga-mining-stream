@@ -25,6 +25,11 @@ public class StreamDistributor {
         }
 
     }
+    
+    
+    public void resizeWindows() {
+        
+    }
 
     public void distribute( List< String > chunk, HashMap< String, Window > windows ) {
 
@@ -36,7 +41,6 @@ public class StreamDistributor {
             Window window = windows.get( encodedClass );
             window.getChromossomes().add( chromossome );
         }
-
     }
 
 }
