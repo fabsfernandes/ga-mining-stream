@@ -2,6 +2,7 @@
 package br.com.ufu.lsi.util;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import br.com.ufu.lsi.model.Chromossome;
@@ -22,6 +23,13 @@ public class Print {
             }
             System.out.println();
             
+        }
+    }
+    
+    public static void printRecords( List<String> records ){
+        int i = 0;
+        for( String s : records ){
+            System.out.println( "[" + ++i + "] " + s );
         }
     }
 }

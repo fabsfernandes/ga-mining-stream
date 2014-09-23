@@ -21,10 +21,14 @@ public class Main {
 
     public void run() {
         
-        BufferedReader bf = streamGenerator.initializeStream();
+        BufferedReader bf = streamGenerator.buildDataset( 100000 );
         
-        List< String > records = streamGenerator.readChunk( 5000, bf );
-
+       
+        List< String > records = streamGenerator.readChunkSequence( 300, NurseryDataset.datasetSize, bf );
+        //List< String > records = streamGenerator.readChunkRandomly( 300, NurseryDataset.datasetSize, bf );
+        
+        Print.printRecords( records );
+        
         streamDistributor.initializeWindows( windows, NurseryDataset.encodedClasses );
 
         streamDistributor.distribute( records, windows );
