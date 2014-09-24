@@ -1,20 +1,24 @@
 
 package br.com.ufu.lsi.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Window {
 
     private List< Chromossome > chromossomes;
-    
+
     private String encodedClass;
-    
-    // TODO: analyze windows sizes. Temporary dot not worry with this.
-    private int size;
-    
-    public Window( String encodedClass, List<Chromossome> chromossomes ){
+
+    private WindowStatistic currentSize;
+
+    private List< WindowStatistic > historyStatistics;
+
+    public Window( String encodedClass, List< Chromossome > chromossomes ) {
         this.encodedClass = encodedClass;
         this.chromossomes = chromossomes;
+        this.historyStatistics = new ArrayList< WindowStatistic >();
+        this.currentSize = new WindowStatistic( 0, 0.0 );
     }
 
     public List< Chromossome > getChromossomes() {
@@ -33,16 +37,24 @@ public class Window {
         this.encodedClass = encodedClass;
     }
 
-    public int getSize() {
-        return size;
+    public void clear() {
+        this.chromossomes.clear();
     }
 
-    public void setSize( int size ) {
-        this.size = size;
+    public List< WindowStatistic > getHistoryStatistics() {
+        return historyStatistics;
     }
-    
-    public void clear(){
-        this.chromossomes.clear();
+
+    public void setHistoryStatistics( List< WindowStatistic > historyStatistics ) {
+        this.historyStatistics = historyStatistics;
+    }
+
+    public WindowStatistic getCurrentSize() {
+        return currentSize;
+    }
+
+    public void setCurrentSize( WindowStatistic currentSize ) {
+        this.currentSize = currentSize;
     }
 
 }
