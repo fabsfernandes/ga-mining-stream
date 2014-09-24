@@ -30,6 +30,12 @@ public class Nursery extends Chromossome {
     public void decode() {
 
     }
+    
+    
+    public String getEncodedClass() {
+        return genes[ genes.length - 1 ].getValue();
+    }
+
 
     @Override
     public String toString() {

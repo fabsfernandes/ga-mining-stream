@@ -1,0 +1,6 @@
+== Decisions
+
+1) Generate full dataset first, before start reading
+2) Window resizing strategy
+3) Create population with last gene representing correct class
+4) Load window with chromossomes: last gene representing correct class and all genes active
