@@ -1,9 +1,12 @@
 package br.com.ufu.lsi.model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class RuleSet {
+public class RuleSet implements Serializable{
     
+    private static final long serialVersionUID = 1L;
+
     private String encodedClass;
     
     private List<Chromossome> population;

@@ -15,7 +15,8 @@ import br.com.ufu.lsi.util.RandomGenerator;
 
 public class PopulationCreator {
 
-    public void initializeRuleSets( HashMap< String, RuleSet > ruleSets, List< String > encodedClasses ) {
+    public void initializeRuleSets( HashMap< String, RuleSet > ruleSets,
+            List< String > encodedClasses ) {
 
         for ( String encodedClass : encodedClasses ) {
 
@@ -26,32 +27,35 @@ public class PopulationCreator {
             }
         }
     }
-    
-    
-    public void createPopulation( HashMap< String, RuleSet > ruleSets, int populationSize ){
-        
+
+    public void createPopulation( HashMap< String, RuleSet > ruleSets, int populationSize ) {
+
         for ( Map.Entry< String, RuleSet > ruleSetMap : ruleSets.entrySet() ) {
             String ruleSetClass = ruleSetMap.getKey();
             RuleSet ruleSet = ruleSetMap.getValue();
-            
-            for( int i = 0; i<populationSize; i++ ){
+
+            for ( int i = 0; i < populationSize; i++ ) {
                 Chromossome chromossome = new Nursery();
-                Gene [] genes = chromossome.getGenes();
-                for( int j = 0; j<genes.length-1; j++ ) {
-                    
+                Gene[] genes = chromossome.getGenes();
+                for ( int j = 0; j < genes.length - 1; j++ ) {
+
                     String value = RandomGenerator.randValue( NurseryDataset.attributes.get( j ) );
-                    boolean active = value.charAt( 0 ) == '1' ? true : false;
-                    Gene gene = new Gene( active, value, false );
-                    genes[j] = gene;
+                    Gene gene = new Gene( value, false );
+                    genes[ j ] = gene;
                 }
-                genes[ genes.length-1 ] = new Gene( true, ruleSetClass, true );
-                
-                // todo fitness e equals para chromossome
-                if( !ruleSet.getPopulation().contains( chromossome ) )                
+                genes[ genes.length - 1 ] = new Gene( ruleSetClass, true );
+
+                if ( ! ruleSet.getPopulation().contains( chromossome ) ) {
                     ruleSet.getPopulation().add( chromossome );
-                else i--;
+                } else {
+                    i-- ;
+                }
             }
         }
     }
     
+    public void distributePopultationInRuleSets( HashMap< String, RuleSet > ruleSets, HashMap< String, List<Chromossome>> population ) {
+        
+    }
+
 }

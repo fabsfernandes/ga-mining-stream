@@ -4,3 +4,6 @@
 2) Window resizing strategy
 3) Create population with last gene representing correct class
 4) Load window with chromossomes: last gene representing correct class and all genes active
+
+5) Rules with at least one antecedent TODO (population, crossover, fitness, ...)
+5) Fitness function: when there is no A (division by 0) => predictive accuracy = 0

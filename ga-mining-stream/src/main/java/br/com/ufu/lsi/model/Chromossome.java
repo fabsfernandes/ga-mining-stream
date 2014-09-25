@@ -1,7 +1,11 @@
 package br.com.ufu.lsi.model;
 
-public abstract class Chromossome {
+import java.io.Serializable;
+
+public abstract class Chromossome implements Serializable {
     
+    private static final long serialVersionUID = 1L;
+
     protected double fitness;
         
     protected Gene [] genes;
@@ -13,6 +17,10 @@ public abstract class Chromossome {
     public abstract String toStringEncoded();
     
     public abstract String getEncodedClass();
+    
+    public abstract boolean antecedentEquals( Chromossome chrom );
+    
+    public abstract boolean antecedentConsequentEquals( Chromossome chrom );
 
     public double getFitness() {
         return fitness;
