@@ -1,27 +1,22 @@
 package br.com.ufu.lsi.model;
 
-public class Gene {
+import java.io.Serializable;
+
+public class Gene implements Serializable {
     
-    private Boolean active;
+    //private Boolean active;
     
     private String value;
     
     private Boolean isClass;
 
-    public Gene( Boolean active, String value, Boolean isClass ) {
+    public Gene( String value, Boolean isClass ) {
         super();
-        this.active = active;
+        //this.active = active;
         this.value = value;
         this.isClass = isClass;
     }
 
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive( Boolean active ) {
-        this.active = active;
-    }
 
     public String getValue() {
         return value;
@@ -41,7 +36,7 @@ public class Gene {
 
     @Override
     public String toString() {
-        return "Gene [active=" + active + ", value=" + value + ", isClass=" + isClass + "]";
+        return "Gene [value=" + value + ", isClass=" + isClass + "]";
     }
     
     public String toStringEncoded() {

@@ -7,6 +7,7 @@ import java.util.List;
 
 import br.com.ufu.lsi.generator.StreamDistributor;
 import br.com.ufu.lsi.generator.StreamGenerator;
+import br.com.ufu.lsi.genetic.GeneticEngine;
 import br.com.ufu.lsi.genetic.PopulationCreator;
 import br.com.ufu.lsi.model.Chromossome;
 import br.com.ufu.lsi.model.NurseryDataset;
@@ -21,6 +22,8 @@ public class Main {
     private StreamDistributor streamDistributor = new StreamDistributor();
     
     private PopulationCreator populationCreator = new PopulationCreator();
+    
+    private GeneticEngine geneticEngine = new GeneticEngine();
 
     private HashMap< String, Window > windows = new HashMap< String, Window >();
     
@@ -34,11 +37,9 @@ public class Main {
         
         populationCreator.initializeRuleSets( ruleSets, NurseryDataset.encodedClasses );
         
-        populationCreator.createPopulation( ruleSets, 50 );
         
-        Print.printRuleSets( ruleSets );
 
-        /*for ( int i = 0; i < 15; i++ ) {
+        for ( int i = 0; i < 1; i++ ) {
             
             List< String > records = streamGenerator.readChunkSequence( 300, NurseryDataset.datasetSize, bf );
             // List< String > records = streamGenerator.readChunkRandomly( 300, NurseryDataset.datasetSize, bf );
@@ -48,8 +49,15 @@ public class Main {
 
             streamDistributor.distribute( chromossomes, windows );
 
-            Print.printWindows( windows );
-        }*/
+            populationCreator.createPopulation( ruleSets, 50 );
+            
+            geneticEngine.setInitialPopulationFitness( ruleSets, windows, 0.7, 0.3 );
+            
+            Print.printRuleSets( ruleSets );
+            //Print.printWindows( windows );
+            
+            geneticEngine.findRule( ruleSets, windows, 0.7, 0.3 );
+        }
     }
 
     public static void main( String... args ) {

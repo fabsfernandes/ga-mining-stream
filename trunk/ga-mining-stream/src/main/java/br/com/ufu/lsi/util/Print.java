@@ -52,11 +52,15 @@ public class Print {
             System.out.println( "==> RuleSet " + encodedClass );
             
             for( Chromossome chromossome : ruleSet.getPopulation() ){
-                System.out.println( chromossome.toStringEncoded() );
+                System.out.println( chromossome.toStringEncoded() + " " + chromossome.getFitness() );
             }
             System.out.println();
         }
-        
+    }
+    
+    public static void printChromossomes( List<Chromossome> chromossomes ) {
+        for( Chromossome chromossome : chromossomes )
+            System.out.println( chromossome.toStringEncoded() + " " + chromossome.getFitness() );
     }
     
 }

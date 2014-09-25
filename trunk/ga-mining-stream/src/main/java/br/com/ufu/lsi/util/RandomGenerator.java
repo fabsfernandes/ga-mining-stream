@@ -38,6 +38,17 @@ public class RandomGenerator {
         
     }
     
-    
-
+    public static List<Integer> randListValues( int min, int max, int totalNumbers ) {
+        
+        List<Integer> randValues = new ArrayList<Integer>();
+        for( int i = 0; i < totalNumbers; i++ ) {
+            int value = randInt( min, max );
+            if( !randValues.contains( value ) ) {
+                randValues.add( value );
+            } else {
+                i--;
+            }
+        }
+        return randValues;
+    }
 }

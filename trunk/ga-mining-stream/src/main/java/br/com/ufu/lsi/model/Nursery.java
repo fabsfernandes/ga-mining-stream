@@ -15,13 +15,12 @@ public class Nursery extends Chromossome {
 
             String code = NurseryDataset.attributes.get( i ).get( values[ i ] );
             Boolean isClass = ( i + 1 == values.length ) ? true : false;
-            Boolean isActive = true;
             
-            if( isActive && !isClass ){
+            if( !isClass ){
                 code = ("1" + code);
             }
             
-            Gene gene = new Gene( isActive, code, isClass );
+            Gene gene = new Gene( code, isClass );
             genes[ i ] = gene;
         }
         return genes[ genes.length - 1 ].getValue();
@@ -35,7 +34,47 @@ public class Nursery extends Chromossome {
     public String getEncodedClass() {
         return genes[ genes.length - 1 ].getValue();
     }
+    
+    public boolean antecedentEquals( Chromossome chrom ) {
+        
+        Gene [] chromossomeGenes = chrom.getGenes();
+        for( int i = 0; i<chromossomeGenes.length-1; i++ ) {
+            String value = this.genes[i].getValue();
+            if( value.charAt( 0 ) == '1' ) {
+                if( !chromossomeGenes[i].getValue().equals( value ) )
+                    return false;
+            }
+        }
+        return true;
+    }
 
+    public boolean antecedentConsequentEquals( Chromossome chrom ) {
+        
+        Gene [] chromossomeGenes = chrom.getGenes();
+        for( int i = 0; i<chromossomeGenes.length-1; i++ ) {
+            String value = this.genes[i].getValue();
+            if( value.charAt( 0 ) == '1' ) {
+                if( !chromossomeGenes[i].getValue().equals( value ) )
+                    return false;
+            }
+        }
+        
+        String chromossomeClassValue = this.genes[ this.genes.length-1 ].getValue();
+        String chromClassValue = chromossomeGenes[ chromossomeGenes.length-1 ].getValue();
+        
+        return chromossomeClassValue.equals( chromClassValue ) ? true : false;
+    }
+
+    @Override
+    public boolean equals( Object object ) {
+        Nursery chromossome = (Nursery) object;
+        Gene [] chromossomeGenes = chromossome.getGenes();
+        for( int i = 0; i<chromossomeGenes.length; i++ ) {
+            if( !chromossomeGenes[i].getValue().equals( this.genes[i].getValue() ) )
+                return false;
+        }
+        return true;
+    }
 
     @Override
     public String toString() {
@@ -45,6 +84,7 @@ public class Nursery extends Chromossome {
         }
         return chromossome.toString();
     }
+    
     
     public String toStringEncoded() {
         
