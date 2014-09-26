@@ -2,6 +2,7 @@
 package br.com.ufu.lsi.genetic;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,11 +11,9 @@ import org.apache.commons.lang3.SerializationUtils;
 
 import br.com.ufu.lsi.model.Chromossome;
 import br.com.ufu.lsi.model.Gene;
-import br.com.ufu.lsi.model.Nursery;
 import br.com.ufu.lsi.model.NurseryDataset;
 import br.com.ufu.lsi.model.RuleSet;
 import br.com.ufu.lsi.model.Window;
-import br.com.ufu.lsi.util.Print;
 import br.com.ufu.lsi.util.RandomGenerator;
 
 public class GeneticEngine {
@@ -25,17 +24,33 @@ public class GeneticEngine {
         for ( Map.Entry< String, RuleSet > ruleSetMap : ruleSets.entrySet() ) {
 
             RuleSet ruleSet = ruleSetMap.getValue();
-            calculatePopulationFitness( ruleSet, windows, w1, w2 );
-            RuleSet newSubPopulation = createNewSubPopulation( ruleSet, 0.8, 0.6, 0.3, 0.3 );
-            //replaceOldPopulation( ruleSet, newSubPopulation );
-
+            calculateRuleSetFitness( ruleSet, windows, w1, w2 );
+            RuleSet newSubPopulation = createNewSubPopulation( ruleSet, 0.8, 0.6, 0.3, 0.3, windows, w1, w2 );
+            eliteSelection( ruleSet, newSubPopulation, 0.2 );
         }
-
-        // repeat findRule
+    }
+    
+    public void eliteSelection( RuleSet ruleSet, RuleSet newSubPopulation, double eliteSelectionRate ) {
+        
+        List<Chromossome> population = ruleSet.getPopulation();
+        List<Chromossome> children = newSubPopulation.getPopulation();
+        
+        Double quantityParentsSelectionFloat = Math.ceil( eliteSelectionRate * population.size() );
+        int quantityParentsSelection = quantityParentsSelectionFloat.intValue();
+        
+        int populationSize = population.size();
+        int j = 0;
+        population.subList( quantityParentsSelection, populationSize ).clear();
+        for( int i = quantityParentsSelection; i < populationSize; i++ ) {
+            population.add( children.get( j++ ) );
+        }
+        
+        Collections.sort(  population );
     }
 
     public RuleSet createNewSubPopulation( RuleSet population, Double crossoverRate,
-            Double mutationRate, Double insertionRate, Double removalRate ) {
+            Double mutationRate, Double insertionRate, Double removalRate, HashMap< String, Window > windows,
+            double w1, double w2 ) {
 
         List< Chromossome > parentsSelected = selectParents( population, crossoverRate );
 
@@ -43,10 +58,13 @@ public class GeneticEngine {
 
         mutation( children, mutationRate );
         
-        //TODO: test this method
         insertionAndRemoval( children, insertionRate, removalRate );
-
-        return null;
+        
+        calculatePopulationFitness( children, windows, w1, w2 );
+        
+        RuleSet newSubPopulation = new RuleSet( population.getEncodedClass(), children );
+        
+        return newSubPopulation;
     }
     
     public void insertionAndRemoval( List<Chromossome> children, Double insertionRate, Double removalRate ) {
@@ -71,21 +89,24 @@ public class GeneticEngine {
             
             
             double rateToActivate = (insertionRate * deactiveted) / (genes.length-1);
-            Double quantityToActivateFloat = rateToActivate * deactiveted;
+            Double quantityToActivateFloat = Math.ceil( rateToActivate * deactiveted );
             int quantityToActivate = quantityToActivateFloat.intValue();
             
             List<Integer> genesToActivate = RandomGenerator.randListValues( 0, genesDeactivated.size()-1, quantityToActivate );
             for( Integer i : genesToActivate ){
-                genesDeactivated.get( i ).getValue().replaceFirst( "0", "1" );
+                String newValue = genesDeactivated.get( i ).getValue().replaceFirst( "0", "1" );
+                genesDeactivated.get( i ).setValue( newValue );
+                
             }
             
             double rateToDeactivate = (removalRate * activeted) / (genes.length-1);
-            Double quantityToDeactivateFloat = rateToDeactivate * activeted;
+            Double quantityToDeactivateFloat = Math.ceil( rateToDeactivate * activeted );
             int quantityToDeactivate = quantityToDeactivateFloat.intValue();
             
             List<Integer> genesToDeactivate = RandomGenerator.randListValues( 0, genesActivated.size()-1, quantityToDeactivate );
             for( Integer i : genesToDeactivate ){
-                genesActivated.get( i ).getValue().replaceFirst( "1", "0" );
+                String newValue = genesActivated.get( i ).getValue().replaceFirst( "1", "0" );
+                genesActivated.get( i ).setValue( newValue );
             }
         }
     }
@@ -212,15 +233,22 @@ public class GeneticEngine {
         return parents;
     }
 
-    public void calculatePopulationFitness( RuleSet population, HashMap< String, Window > windows,
+    
+    public void calculatePopulationFitness( List<Chromossome> children, HashMap<String, Window> windows, double w1, double w2 ) {
+        
+        for ( Chromossome chromossome : children ) {
+            double fitness = fitness( chromossome, windows, w1, w2 );
+            chromossome.setFitness( fitness );
+        }
+        Collections.sort( children );
+    }
+    
+    public void calculateRuleSetFitness( RuleSet population, HashMap< String, Window > windows,
             double w1, double w2 ) {
 
         List< Chromossome > chromossomes = population.getPopulation();
 
-        for ( Chromossome chromossome : chromossomes ) {
-            double fitness = fitness( chromossome, windows, w1, w2 );
-            chromossome.setFitness( fitness );
-        }
+        calculatePopulationFitness( chromossomes, windows, w1, w2 );
     }
 
     public void setInitialPopulationFitness( HashMap< String, RuleSet > ruleSets,
@@ -231,10 +259,7 @@ public class GeneticEngine {
             RuleSet ruleSet = ruleSetMap.getValue();
             List< Chromossome > chromossomes = ruleSet.getPopulation();
 
-            for ( Chromossome chromossome : chromossomes ) {
-                double fitness = fitness( chromossome, windows, w1, w2 );
-                chromossome.setFitness( fitness );
-            }
+            calculatePopulationFitness( chromossomes, windows, w1, w2 );
         }
     }
 

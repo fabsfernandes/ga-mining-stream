@@ -2,7 +2,7 @@ package br.com.ufu.lsi.model;
 
 import java.io.Serializable;
 
-public abstract class Chromossome implements Serializable {
+public abstract class Chromossome implements Serializable, Comparable< Chromossome > {
     
     private static final long serialVersionUID = 1L;
 
@@ -21,6 +21,8 @@ public abstract class Chromossome implements Serializable {
     public abstract boolean antecedentEquals( Chromossome chrom );
     
     public abstract boolean antecedentConsequentEquals( Chromossome chrom );
+    
+    public abstract boolean sameAntecedent( Chromossome chrom );
 
     public double getFitness() {
         return fitness;
@@ -36,5 +38,15 @@ public abstract class Chromossome implements Serializable {
 
     public void setGenes( Gene[] genes ) {
         this.genes = genes;
+    }
+    
+    @Override
+    public int compareTo( Chromossome otherChromossome ) {
+        if( this.fitness < otherChromossome.fitness )
+            return 1;
+        if( this.fitness > otherChromossome.fitness ) {
+            return -1;
+        }
+        return 0;
     }
 }
