@@ -6,4 +6,7 @@
 4) Load window with chromossomes: last gene representing correct class and all genes active
 
 5) Rules with at least one antecedent TODO (population, crossover, fitness, ...)
-5) Fitness function: when there is no A (division by 0) => predictive accuracy = 0
+6) Fitness function: when there is no A (division by 0) => predictive accuracy = 0
+7) Elite selection fixed in 20% - 10 parents
+8) What is "one rule overlap and contradicts other"?
+9) Sera q tem problema manter a populacao ordenada pelo fitness?
