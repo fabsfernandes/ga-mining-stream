@@ -88,8 +88,20 @@ public class StreamDistributor {
     }
 
     public void distribute( List< Chromossome > chromossomes, HashMap< String, Window > windows ) {
-
+        
+        for ( Map.Entry< String, Window > windowMap : windows.entrySet() ) {
+           
+            Window window = windowMap.getValue();
+            window.getChromossomes().clear();
+        }
+        
         for ( Chromossome chromossome : chromossomes ) {
+            
+            Window window = windows.get( chromossome.getEncodedClass() );
+            window.getChromossomes().add( chromossome );
+        }
+
+        /*for ( Chromossome chromossome : chromossomes ) {
             
             Window window = windows.get( chromossome.getEncodedClass() );
             window.getChromossomes().add( chromossome );
@@ -104,16 +116,7 @@ public class StreamDistributor {
                 chroms.remove( 0 );
             }
             
-            /*if( window.getCurrentSize().getSize() <= chroms.size() ) {
-                List< Chromossome > newChroms = chroms.subList( 0, window.getCurrentSize().getSize() );
-                window.setChromossomes( newChroms );
-            }*/
-        }
-        
-        /*Window window = windows.get( "10000" );
-        System.out.println( "Window 10000: " + window.getCurrentSize().getSize() );
-        for( Chromossome c : window.getChromossomes() )
-            System.out.println( c.toStringEncoded() );*/
+        }*/
 
     }
 

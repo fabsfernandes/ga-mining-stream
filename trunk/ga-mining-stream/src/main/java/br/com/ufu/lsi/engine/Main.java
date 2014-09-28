@@ -4,6 +4,7 @@ package br.com.ufu.lsi.engine;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import br.com.ufu.lsi.generator.RuleSetEvaluator;
 import br.com.ufu.lsi.generator.StreamDistributor;
@@ -38,9 +39,10 @@ public class Main {
     public void run() {
 
         int index = 0;
-        int conceptDrift = 5000;
+        int conceptDrift = 50000;
+        int errorCalc = 5000;
         
-        List<String> lines = streamGenerator.buildDataset( 200000 );
+        List<String> lines = streamGenerator.buildDataset( 200300 );
 
         streamDistributor.initializeWindows( windows, NurseryDataset.encodedClasses );
         
@@ -57,13 +59,13 @@ public class Main {
         
         geneticEngine.setInitialPopulationFitness( ruleSets, windows, 0.7, 0.3 );
 
-        for( int i = 0, conceptDriftCounter = 0; ; i++, index += 300, conceptDriftCounter+=300 ) {
+        for( int i = 0, conceptDriftCounter = 0, errorCalcCounter = 0; ; i++, index += 300, conceptDriftCounter+=300, errorCalcCounter+=300 ) {
             
             if( conceptDriftCounter > conceptDrift ) {
                 
-                System.out.println( "*****************************************");
-                System.out.println( " CONCEPT DRIFT ");
-                System.out.println( "*****************************************");
+                //System.out.println( "*****************************************");
+                //System.out.println( " CONCEPT DRIFT ");
+                //System.out.println( "*****************************************");
                 conceptDriftCounter = 0;
                 
                 int att1 = RandomGenerator.randInt( 0, NurseryDataset.numberNonClassAttributes-1 );
@@ -73,36 +75,52 @@ public class Main {
                 int att3 = att1;
                 while( att3 == att1 || att3 == att2 )
                     att3 = RandomGenerator.randInt( 0, NurseryDataset.numberNonClassAttributes-1 );
+                int att4 = att1;
+                while( att4 == att1 || att4 == att2 || att4 == att3 )
+                    att4 = RandomGenerator.randInt( 0, NurseryDataset.numberNonClassAttributes-1 );
+                int att5 = att1;
+                while( att5 == att1 || att5 == att2 || att5 == att3 || att5 == att4 )
+                    att5 = RandomGenerator.randInt( 0, NurseryDataset.numberNonClassAttributes-1 );
                 
-                System.out.println( "Attributes: " + att1 + "," + att2 + "," + att3);
-                System.out.println( lines.get(0) );
+                //System.out.println( "Attributes: " + att1 + "," + att2 + "," + att3);
                 streamGenerator.conceptDriftOnAttribute( lines, att1 );
                 streamGenerator.conceptDriftOnAttribute( lines, att2 );
                 streamGenerator.conceptDriftOnAttribute( lines, att3 );
-                System.out.println( lines.get(0) );
+                streamGenerator.conceptDriftOnAttribute( lines, att4 );
+                streamGenerator.conceptDriftOnAttribute( lines, att5 );
                 
             }
             
-            System.out.println( conceptDriftCounter + " " + records.size());
+            //System.out.println( conceptDriftCounter + " " + records.size());
             
             records = streamGenerator.readChunkSequence( lines, index, 300 );
             if( records == null )
                 break;
-
+            
             chromossomes = streamDistributor.analyzeWindows( 3, records, windows );
 
             streamDistributor.distribute( chromossomes, windows );
+            
+            if( errorCalcCounter > errorCalc ) {
+                errorCalcCounter = 0;
+                double error = ruleSetEvaluator.calculateError2( finalRuleSet, windows );
+                System.out.println( error );
+            }
             
             geneticEngine.findRule( ruleSets, windows, 0.7, 0.3 );
             
             ruleSetEvaluator.handleFinalRuleSet( ruleSets, finalRuleSet, windows );
             
-            System.gc();
+            //System.out.println( "Final Set");
+            //for( FinalRule finalRule : finalRuleSet )
+            //    System.out.println( finalRule + " " + finalRule.getRule().getFitness() );
             
         }
-        System.out.println( "Final Set");
-        for( FinalRule finalRule : finalRuleSet )
-            System.out.println( finalRule );
+        //System.out.println( "=======Final Set");
+        for( FinalRule finalRule : finalRuleSet ) {
+            //if( finalRule.getConfidence() > 0.6 )
+              //  System.out.println( finalRule );
+        }
     }
 
     public static void main( String... args ) {

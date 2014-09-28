@@ -11,7 +11,7 @@ public class RandomGenerator {
     
     public static Random random;
     
-    private static long seed = 1000;
+    private static long seed = 1;
     
     static {
         random = new Random( seed );

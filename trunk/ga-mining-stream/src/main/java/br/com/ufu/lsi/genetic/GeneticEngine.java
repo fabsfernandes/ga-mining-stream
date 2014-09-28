@@ -25,7 +25,7 @@ public class GeneticEngine {
 
             RuleSet ruleSet = ruleSetMap.getValue();
             calculateRuleSetFitness( ruleSet, windows, w1, w2 );
-            RuleSet newSubPopulation = createNewSubPopulation( ruleSet, 0.8, 0.6, 0.1, 0.9, windows, w1, w2 );
+            RuleSet newSubPopulation = createNewSubPopulation( ruleSet, 0.8, 0.6, 0.3, 0.3, windows, w1, w2 );
             eliteSelection( ruleSet, newSubPopulation, 0.1 );
         }
     }
@@ -41,8 +41,11 @@ public class GeneticEngine {
         int populationSize = population.size();
         int j = 0;
         population.subList( quantityParentsSelection, populationSize ).clear();
-        for( int i = quantityParentsSelection; population.size() < populationSize && j < children.size(); i++ ) {
-            population.add( children.get( j++ ) );
+        //for( int i = quantityParentsSelection; population.size() < populationSize && j < children.size(); i++ ) {
+         //   population.add( children.get( j++ ) );
+        //}
+        for( j=0; j < children.size(); j++ ) {
+            population.add( children.get( j ) );
         }
         
         Collections.sort(  population );
@@ -187,7 +190,7 @@ public class GeneticEngine {
 
         RuleSet populationClone = SerializationUtils.clone( population );
 
-        Double quantity = crossoverRate * population.getPopulation().size();
+        Double quantity = Math.ceil(crossoverRate * population.getPopulation().size());
         int parentsNumber = quantity.intValue();
         parentsNumber = parentsNumber % 2 == 0 ? parentsNumber : parentsNumber + 1;
 

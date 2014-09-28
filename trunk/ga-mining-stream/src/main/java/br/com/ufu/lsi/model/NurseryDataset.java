@@ -91,7 +91,7 @@ public class NurseryDataset {
         
         HashMap<String,String> clazz = new HashMap<String,String>();
         clazz.put( "not_recom", "10000" );
-        clazz.put( "recommend", "01000" );
+        //clazz.put( "recommend", "01000" );
         clazz.put( "very_recom", "00100" );
         clazz.put( "priority", "00010" );
         clazz.put( "spec_prior", "00001" );
