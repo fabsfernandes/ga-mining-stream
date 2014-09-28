@@ -9,41 +9,107 @@ import java.util.Map;
 
 import org.apache.commons.lang3.SerializationUtils;
 
+import br.com.ufu.lsi.genetic.GeneticEngine;
 import br.com.ufu.lsi.model.Chromossome;
 import br.com.ufu.lsi.model.FinalRule;
 import br.com.ufu.lsi.model.RuleSet;
 import br.com.ufu.lsi.model.Window;
 
 public class RuleSetEvaluator {
+    
+    public double calculateError( List< FinalRule > finalRuleSet, HashMap< String, Window > windows ) {
+        
+        double correct = 0.0;
+        double total = 0.0;
+        for ( Map.Entry< String, Window > windowMap : windows.entrySet() ) {
+            String windowClass = windowMap.getKey();
+            Window window = windowMap.getValue();
+            
+            total += window.getChromossomes().size();
+            
+            for( Chromossome chrom : window.getChromossomes() ){
+                for( FinalRule finalRule : finalRuleSet ) {                
+                    if( finalRule.getConfidence() > 0.7 ) {
+                        if( finalRule.getRule().getEncodedClass().equals( windowClass ) ) {
+                        
+                            if( finalRule.getRule().antecedentEquals( chrom ) ){
+                                correct++;
+                                break;
+                            }
+                        }
+                    }
+                    
+                }
+            }
+        }
+        
+        double accuracy = correct/total;
+        
+        return (1.0 - accuracy);
+        
+    }
+    
+    public double calculateError2( List< FinalRule > finalRuleSet, HashMap< String, Window > windows ) {
+        
+        double correct = 0.0;
+        double total = 0.0;
+        
+        for( FinalRule finalRule : finalRuleSet ) { 
+            
+            if( finalRule.getConfidence() > 0.7 ) {
+                
+                for ( Map.Entry< String, Window > windowMap : windows.entrySet() ) {
+                    String windowClass = windowMap.getKey();
+                    Window window = windowMap.getValue();
+            
+                        for( Chromossome chrom : window.getChromossomes() ){
+                            
+                            if( finalRule.getRule().antecedentEquals( chrom ) ) {
+                    
+                                total++;
+                                if( finalRule.getRule().getEncodedClass().equals( windowClass ) ) {
+                                    
+                                    correct++;
+                                }
+                            }
+                        }
+                    
+                }
+            }
+        }
+        
+        double accuracy = correct/total;
+        
+        return (1.0 - accuracy);
+        
+    }
+        
 
     public void handleFinalRuleSet( HashMap< String, RuleSet > ruleSets,
             List< FinalRule > finalRuleSet, HashMap< String, Window > windows ) {
 
-        Chromossome bestRule = findBestRule( ruleSets );
-        //List<Chromossome> bestRules = findBestRules( ruleSets );
-
-        //for( Chromossome bestRule : bestRules ) {
-        Double support = calculateSupport( bestRule, windows );
-
-        Double confidence = calculateConfidence( bestRule, windows );
+        List<Chromossome> bestRules = findBestRules( ruleSets );
         
-        
-
-        FinalRule finalRule = new FinalRule( bestRule, support, confidence );
-        checkContradiction( finalRule, finalRuleSet );
-
-        finalRuleSet.add( finalRule );
-        
-        updateSupportConfidence( finalRuleSet, windows );
-        //}
-        //for( FinalRule rule : finalRuleSet )
-        //    System.out.println( rule + " " + rule.getRule().getFitness() );
+        for( Chromossome bestRule : bestRules) {
+            Double support = calculateSupport( bestRule, windows );
+    
+            Double confidence = calculateConfidence( bestRule, windows );
+            
+            FinalRule finalRule = new FinalRule( bestRule, support, confidence );
+            checkContradiction( finalRule, finalRuleSet );
+    
+            finalRuleSet.add( finalRule );
+        }
+        updateSupportConfidenceAndFitness( finalRuleSet, windows );
     }
     
-    public void updateSupportConfidence( List<FinalRule> finalRuleSet, HashMap< String, Window > windows ) {
+    public void updateSupportConfidenceAndFitness( List<FinalRule> finalRuleSet, HashMap< String, Window > windows ) {
         for( FinalRule rule : finalRuleSet ) {
             rule.setConfidence( calculateConfidence( rule.getRule(), windows ) );
             rule.setSupport( calculateSupport( rule.getRule(), windows ) );
+            
+            // temp
+            rule.getRule().setFitness( new GeneticEngine().fitness( rule.getRule(), windows, 0.7, 0.3 ) );
         }
     }
 

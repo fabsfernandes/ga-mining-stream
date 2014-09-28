@@ -20,7 +20,7 @@ public class StreamGenerator {
 
     private static final Logger logger = LogManager.getLogger( StreamGenerator.class.getName() );
 
-    private static final String DATA_SET_ORIGINAL_PATH = "/Users/fabiola/Doutorado/IA/Trabalho1/dataset/nursery.csv";
+    private static final String DATA_SET_ORIGINAL_PATH = "/Users/fabiola/Doutorado/IA/Trabalho1/dataset/nursery4classes.csv";
     
     public List< String > buildDataset( int datasetSize ) {
 
