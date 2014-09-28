@@ -25,8 +25,8 @@ public class GeneticEngine {
 
             RuleSet ruleSet = ruleSetMap.getValue();
             calculateRuleSetFitness( ruleSet, windows, w1, w2 );
-            RuleSet newSubPopulation = createNewSubPopulation( ruleSet, 0.8, 0.6, 0.3, 0.3, windows, w1, w2 );
-            eliteSelection( ruleSet, newSubPopulation, 0.2 );
+            RuleSet newSubPopulation = createNewSubPopulation( ruleSet, 0.8, 0.6, 0.1, 0.9, windows, w1, w2 );
+            eliteSelection( ruleSet, newSubPopulation, 0.1 );
         }
     }
     
@@ -41,7 +41,7 @@ public class GeneticEngine {
         int populationSize = population.size();
         int j = 0;
         population.subList( quantityParentsSelection, populationSize ).clear();
-        for( int i = quantityParentsSelection; i < populationSize; i++ ) {
+        for( int i = quantityParentsSelection; population.size() < populationSize && j < children.size(); i++ ) {
             population.add( children.get( j++ ) );
         }
         
@@ -146,12 +146,12 @@ public class GeneticEngine {
             Chromossome c2 = parentsSelected.get( i + 1 );
             Chromossome[] twoChildren = twoPointCrossover( c1, c2 );
 
-            if ( ! children.contains( twoChildren[ 0 ] ) && ! children.contains( twoChildren[ 1 ] ) ) {
+           // if ( ! children.contains( twoChildren[ 0 ] ) && ! children.contains( twoChildren[ 1 ] ) ) {
                 children.add( twoChildren[ 0 ] );
                 children.add( twoChildren[ 1 ] );
-            } else {
-                i -= 2;
-            }
+           // } else {
+           //     i -= 2;
+          //  }
         }
 
         return children;
@@ -201,6 +201,8 @@ public class GeneticEngine {
             populationClone.getPopulation().remove( selectedParents[ 0 ] );
             populationClone.getPopulation().remove( selectedParents[ 1 ] );
         }
+        
+        populationClone = null;
 
         return parents;
     }
@@ -292,7 +294,7 @@ public class GeneticEngine {
             }
         }
 
-        double predictiveAccuracy = numberA == 0.0 ? 0.0 : ( numberAC ) / numberA;
+        double predictiveAccuracy = numberA == 0.0 || numberAC == 0.0 ? 0.0 : ( numberAC - 0.5 ) / numberA;
 
         return predictiveAccuracy;
     }

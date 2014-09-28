@@ -31,6 +31,8 @@ public class NurseryDataset {
     
     public static final int datasetSize = 12960;
     
+    public static final int numberNonClassAttributes = 8;
+    
     static {
         attributes = new HashMap<Integer,HashMap<String,String>>();
         decodedClasses = Arrays.asList( "not_recom", "recommended", "very_recom", "priority", "spec_prior" );

@@ -41,7 +41,7 @@ public class FinalRule {
 
     @Override
     public String toString() {
-        return "FinalRule [rule=" + rule.toStringEncoded() + ", support=" + support + ", confidence=" + confidence
+        return "[rule=" + rule.toStringEncoded() + ", support=" + support + ", confidence=" + confidence
                 + "]";
     }
 
