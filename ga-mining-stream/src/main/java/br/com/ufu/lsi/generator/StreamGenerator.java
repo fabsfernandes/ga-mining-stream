@@ -2,17 +2,18 @@
 package br.com.ufu.lsi.generator;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import br.com.ufu.lsi.model.NurseryDataset;
 import br.com.ufu.lsi.util.RandomGenerator;
 
 public class StreamGenerator {
@@ -20,14 +21,10 @@ public class StreamGenerator {
     private static final Logger logger = LogManager.getLogger( StreamGenerator.class.getName() );
 
     private static final String DATA_SET_ORIGINAL_PATH = "/Users/fabiola/Doutorado/IA/Trabalho1/dataset/nursery.csv";
-
-    private static final String DATA_SET_GENERATED_PATH = "/Users/fabiola/Doutorado/IA/Trabalho1/dataset/nurseryGenerated.csv";
-
-    public BufferedReader buildDataset( int datasetSize ) {
+    
+    public List< String > buildDataset( int datasetSize ) {
 
         List< String > records = new ArrayList< String >();
-
-        BufferedReader bufferReader = null;
 
         try {
 
@@ -49,101 +46,60 @@ public class StreamGenerator {
 
             Collections.shuffle( records, RandomGenerator.random );
 
-            PrintWriter writer = new PrintWriter( DATA_SET_GENERATED_PATH, "UTF-8" );
-            for ( String record : records ) {
-                writer.println( record );
-            }
-            writer.close();
-
-            bufferReader = new BufferedReader( new FileReader( DATA_SET_GENERATED_PATH ) );
-
         } catch ( IOException e ) {
             logger.error( e.getMessage() );
             return null;
         }
 
-        return bufferReader;
-
-    }
-
-    
-    /**
-     * Read sequentially from generated dataset. This is ok because it was
-     * generate randomly. The param datasetSize is just due to compatibility
-     *  
-     * @param recordsNumber
-     * @param datasetSize
-     * @param bufferedReader
-     * @return
-     */
-    public List< String > readChunkSequence( int recordsNumber, int datasetSize, BufferedReader bufferedReader ) {
-
-        List< String > records = new ArrayList< String >();
-
-        for ( int i = 0; i < recordsNumber; i++ ) {
-            try {
-                String record = bufferedReader.readLine();
-                if ( record == null )
-                    break;
-                records.add( record );
-
-            } catch ( IOException e ) {
-                logger.error( e.getMessage() );
-                return null;
-            }
-        }
-
         return records;
+
     }
 
-    
-    /**
-     * Randomly get records from generated file. The records can repeat, even in
-     * the same chunk. The param bufferedReader is just due to compatibility
-     * issues
-     * 
-     * @param recordsNumber
-     * @param datasetSize
-     * @param bufferedReader
-     * @return
-     */
-    public List< String > readChunkRandomly( int recordsNumber, int datasetSize,
-            BufferedReader bufferedReader ) {
+    public List< String > readChunkSequence( List<String> lines, int index, int chunkLength ) {
 
-        List< String > records = new ArrayList< String >();
-
-        for ( int i = 0; i < recordsNumber; i++ ) {
-
-            try {
-                BufferedReader bf = this.initializeStream();
-                int random = RandomGenerator.randInt( 0, datasetSize - 1 );
-
-                for ( int j = 0; j < random; j++ ) {
-                    bf.readLine();
-                }
-
-                String record = bf.readLine();
-                records.add( record );
-
-            } catch ( IOException e ) {
-                logger.error( e.getMessage() );
-                return null;
-            }
-        }
-        return records;
-    }
-
-    public BufferedReader initializeStream() {
-
-        try {
-            BufferedReader br = new BufferedReader( new FileReader( DATA_SET_GENERATED_PATH ) );
-            return br;
-
-        } catch ( FileNotFoundException e ) {
-            logger.error( e.getMessage() );
+        if( index > lines.size() )
             return null;
+        
+        int toIndex = index + chunkLength;
+        if( toIndex > lines.size() ) {
+            toIndex = lines.size() - 1; 
         }
+        List< String > records = lines.subList( index, toIndex );
 
+        return records;
     }
+    
+    public void conceptDriftOnAttribute( List< String > dataset, int attIndex ) {
+        
+        for( int i = 0; i< dataset.size(); i++ ) {
+            String[] attributes = dataset.get( i ).split( "," );
+            String attValue = attributes[attIndex];
+            HashMap<String,String> attValues = NurseryDataset.attributes.get( attIndex );
+            String encodedValue = attValues.get( attValue );
+            
+            
+            char [] encodedValueArray = encodedValue.toCharArray();
+            String str = "";
+            for( int k = 0; k<encodedValue.length()-1; k++ ) {
+                str += encodedValueArray[k];
+            }
+            str = encodedValueArray[ encodedValueArray.length - 1] + str;
+            
+            for ( Map.Entry< String, String > attValue1 : attValues.entrySet() ) {
+                String strKey = attValue1.getKey();
+                String strValue = attValue1.getValue();
+                if( strValue.equals( str ) ){
+                    attributes[attIndex] = strKey;
+                    String finishLine = "";
+                    
+                    for( int j = 0; j < attributes.length-1; j++ )
+                        finishLine += attributes[j] + ",";
+                    finishLine += attributes[ attributes.length-1 ];
+                    dataset.set( i, finishLine );
+                }
+            }
+        }
+    }
+
 
 }

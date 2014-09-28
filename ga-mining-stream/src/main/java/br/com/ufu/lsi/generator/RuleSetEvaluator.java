@@ -1,6 +1,7 @@
 
 package br.com.ufu.lsi.generator;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -15,21 +16,35 @@ import br.com.ufu.lsi.model.Window;
 
 public class RuleSetEvaluator {
 
-    public void insertIntoFinalRuleSet( HashMap< String, RuleSet > ruleSets,
+    public void handleFinalRuleSet( HashMap< String, RuleSet > ruleSets,
             List< FinalRule > finalRuleSet, HashMap< String, Window > windows ) {
 
         Chromossome bestRule = findBestRule( ruleSets );
+        //List<Chromossome> bestRules = findBestRules( ruleSets );
 
+        //for( Chromossome bestRule : bestRules ) {
         Double support = calculateSupport( bestRule, windows );
 
         Double confidence = calculateConfidence( bestRule, windows );
+        
+        
 
         FinalRule finalRule = new FinalRule( bestRule, support, confidence );
         checkContradiction( finalRule, finalRuleSet );
 
         finalRuleSet.add( finalRule );
         
-        System.out.println( finalRule );
+        updateSupportConfidence( finalRuleSet, windows );
+        //}
+        //for( FinalRule rule : finalRuleSet )
+        //    System.out.println( rule + " " + rule.getRule().getFitness() );
+    }
+    
+    public void updateSupportConfidence( List<FinalRule> finalRuleSet, HashMap< String, Window > windows ) {
+        for( FinalRule rule : finalRuleSet ) {
+            rule.setConfidence( calculateConfidence( rule.getRule(), windows ) );
+            rule.setSupport( calculateSupport( rule.getRule(), windows ) );
+        }
     }
 
     public void checkContradiction( FinalRule finalRule, List< FinalRule > finalRuleSet ) {
@@ -104,6 +119,20 @@ public class RuleSetEvaluator {
         }
 
         return SerializationUtils.clone( bestRule );
+    }
+    
+    public List<Chromossome> findBestRules( HashMap< String, RuleSet > ruleSets ) {
+
+        List<Chromossome> bestRules = new ArrayList<Chromossome>();
+        
+        for ( Map.Entry< String, RuleSet > ruleSetMap : ruleSets.entrySet() ) {
+
+            RuleSet ruleSet = ruleSetMap.getValue();
+            Chromossome candidate = ruleSet.getPopulation().get( 0 );
+            bestRules.add( SerializationUtils.clone( candidate ) );
+        }
+
+        return bestRules;
     }
 
 }

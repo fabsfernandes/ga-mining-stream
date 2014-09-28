@@ -1,7 +1,6 @@
 
 package br.com.ufu.lsi.engine;
 
-import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +15,7 @@ import br.com.ufu.lsi.model.FinalRule;
 import br.com.ufu.lsi.model.NurseryDataset;
 import br.com.ufu.lsi.model.RuleSet;
 import br.com.ufu.lsi.model.Window;
+import br.com.ufu.lsi.util.RandomGenerator;
 
 public class Main {
 
@@ -37,14 +37,17 @@ public class Main {
 
     public void run() {
 
-        BufferedReader bf = streamGenerator.buildDataset( 100000 );
+        int index = 0;
+        int conceptDrift = 5000;
+        
+        List<String> lines = streamGenerator.buildDataset( 200000 );
 
         streamDistributor.initializeWindows( windows, NurseryDataset.encodedClasses );
         
         populationCreator.initializeRuleSets( ruleSets, NurseryDataset.encodedClasses );
         
-        List< String > records = streamGenerator.readChunkSequence( 300, NurseryDataset.datasetSize, bf );
-        // List< String > records = streamGenerator.readChunkRandomly( 300, NurseryDataset.datasetSize, bf );
+        List< String > records = streamGenerator.readChunkSequence( lines, index, 300 );
+        index += 300;
         
         List< Chromossome > chromossomes = streamDistributor.analyzeWindows( 3, records, windows );
 
@@ -54,11 +57,37 @@ public class Main {
         
         geneticEngine.setInitialPopulationFitness( ruleSets, windows, 0.7, 0.3 );
 
-        for( int i = 0; !records.isEmpty(); i++ ) {
+        for( int i = 0, conceptDriftCounter = 0; ; i++, index += 300, conceptDriftCounter+=300 ) {
             
-            System.out.println( i + " " + records.size());
-            records = streamGenerator.readChunkSequence( 300, NurseryDataset.datasetSize, bf );
-            // List< String > records = streamGenerator.readChunkRandomly( 300, NurseryDataset.datasetSize, bf );
+            if( conceptDriftCounter > conceptDrift ) {
+                
+                System.out.println( "*****************************************");
+                System.out.println( " CONCEPT DRIFT ");
+                System.out.println( "*****************************************");
+                conceptDriftCounter = 0;
+                
+                int att1 = RandomGenerator.randInt( 0, NurseryDataset.numberNonClassAttributes-1 );
+                int att2 = att1;
+                while( att2 == att1 )
+                    att2 = RandomGenerator.randInt( 0, NurseryDataset.numberNonClassAttributes-1 );
+                int att3 = att1;
+                while( att3 == att1 || att3 == att2 )
+                    att3 = RandomGenerator.randInt( 0, NurseryDataset.numberNonClassAttributes-1 );
+                
+                System.out.println( "Attributes: " + att1 + "," + att2 + "," + att3);
+                System.out.println( lines.get(0) );
+                streamGenerator.conceptDriftOnAttribute( lines, att1 );
+                streamGenerator.conceptDriftOnAttribute( lines, att2 );
+                streamGenerator.conceptDriftOnAttribute( lines, att3 );
+                System.out.println( lines.get(0) );
+                
+            }
+            
+            System.out.println( conceptDriftCounter + " " + records.size());
+            
+            records = streamGenerator.readChunkSequence( lines, index, 300 );
+            if( records == null )
+                break;
 
             chromossomes = streamDistributor.analyzeWindows( 3, records, windows );
 
@@ -66,7 +95,7 @@ public class Main {
             
             geneticEngine.findRule( ruleSets, windows, 0.7, 0.3 );
             
-            ruleSetEvaluator.insertIntoFinalRuleSet( ruleSets, finalRuleSet, windows );
+            ruleSetEvaluator.handleFinalRuleSet( ruleSets, finalRuleSet, windows );
             
             System.gc();
             
