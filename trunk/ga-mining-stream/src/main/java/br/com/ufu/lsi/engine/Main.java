@@ -42,7 +42,7 @@ public class Main {
         int conceptDrift = 50000;
         int errorCalc = 5000;
         
-        List<String> lines = streamGenerator.buildDataset( 200300 );
+        List<String> lines = streamGenerator.buildDataset( 205000 );
 
         streamDistributor.initializeWindows( windows, NurseryDataset.encodedClasses );
         
@@ -58,6 +58,8 @@ public class Main {
         populationCreator.createPopulation( ruleSets, 50 );
         
         geneticEngine.setInitialPopulationFitness( ruleSets, windows, 0.7, 0.3 );
+        
+        long init = System.currentTimeMillis();
 
         for( int i = 0, conceptDriftCounter = 0, errorCalcCounter = 0; ; i++, index += 300, conceptDriftCounter+=300, errorCalcCounter+=300 ) {
             
@@ -83,11 +85,21 @@ public class Main {
                     att5 = RandomGenerator.randInt( 0, NurseryDataset.numberNonClassAttributes-1 );
                 
                 //System.out.println( "Attributes: " + att1 + "," + att2 + "," + att3);
+                /*streamGenerator.conceptDriftOnAttribute( lines, 0 );
+                streamGenerator.conceptDriftOnAttribute( lines, 1 );
+                streamGenerator.conceptDriftOnAttribute( lines, 2 );
+                streamGenerator.conceptDriftOnAttribute( lines, 3 );
+                streamGenerator.conceptDriftOnAttribute( lines, 4 );
+                streamGenerator.conceptDriftOnAttribute( lines, 5 );
+                streamGenerator.conceptDriftOnAttribute( lines, 6 );
+                streamGenerator.conceptDriftOnAttribute( lines, 7 );*/
+                
                 streamGenerator.conceptDriftOnAttribute( lines, att1 );
                 streamGenerator.conceptDriftOnAttribute( lines, att2 );
                 streamGenerator.conceptDriftOnAttribute( lines, att3 );
-                streamGenerator.conceptDriftOnAttribute( lines, att4 );
-                streamGenerator.conceptDriftOnAttribute( lines, att5 );
+                
+                
+                
                 
             }
             
@@ -103,8 +115,10 @@ public class Main {
             
             if( errorCalcCounter > errorCalc ) {
                 errorCalcCounter = 0;
-                double error = ruleSetEvaluator.calculateError2( finalRuleSet, windows );
-                System.out.println( error );
+                double error = ruleSetEvaluator.calculateError( finalRuleSet, windows );
+                System.out.printf( "%.4f\n", error );
+                
+                //System.out.println( System.currentTimeMillis() - init );
             }
             
             geneticEngine.findRule( ruleSets, windows, 0.7, 0.3 );
@@ -117,10 +131,13 @@ public class Main {
             
         }
         //System.out.println( "=======Final Set");
+        int cont = 0;
         for( FinalRule finalRule : finalRuleSet ) {
-            //if( finalRule.getConfidence() > 0.6 )
+            if( finalRule.getConfidence() > 0.7 )
+                cont++;
               //  System.out.println( finalRule );
         }
+        //System.out.println( cont );
     }
 
     public static void main( String... args ) {

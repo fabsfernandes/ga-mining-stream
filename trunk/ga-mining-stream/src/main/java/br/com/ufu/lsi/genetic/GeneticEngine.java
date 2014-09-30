@@ -144,7 +144,7 @@ public class GeneticEngine {
     public List< Chromossome > crossover( List< Chromossome > parentsSelected ) {
         List< Chromossome > children = new ArrayList< Chromossome >();
 
-        for ( int i = 0; i < parentsSelected.size() - 1; i += 2 ) {
+        /*for ( int i = 0; i < parentsSelected.size() - 1; i += 2 ) {
             Chromossome c1 = parentsSelected.get( i );
             Chromossome c2 = parentsSelected.get( i + 1 );
             Chromossome[] twoChildren = twoPointCrossover( c1, c2 );
@@ -155,8 +155,19 @@ public class GeneticEngine {
            // } else {
            //     i -= 2;
           //  }
-        }
+        }*/
 
+        while( children.size() < 45 ) {
+        for ( int i = 0; i < parentsSelected.size() - 1; i += 2 ) {
+            Chromossome c1 = parentsSelected.get( i );
+            Chromossome c2 = parentsSelected.get( i + 1 );
+            Chromossome[] twoChildren = twoPointCrossover( c1, c2 );
+
+                children.add( twoChildren[ 0 ] );
+                if( children.size() < 45 )
+                    children.add( twoChildren[ 1 ] );
+        }
+        }
         return children;
     }
 
