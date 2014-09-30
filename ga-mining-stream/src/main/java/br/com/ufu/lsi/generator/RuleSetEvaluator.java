@@ -28,17 +28,21 @@ public class RuleSetEvaluator {
             total += window.getChromossomes().size();
             
             for( Chromossome chrom : window.getChromossomes() ){
-                for( FinalRule finalRule : finalRuleSet ) {                
-                    if( finalRule.getConfidence() > 0.7 ) {
-                        if( finalRule.getRule().getEncodedClass().equals( windowClass ) ) {
-                        
-                            if( finalRule.getRule().antecedentEquals( chrom ) ){
+                boolean triggered = false;
+                for( FinalRule finalRule : finalRuleSet ) {    
+                    if( finalRule.getConfidence() > 0.3 ) {
+                        if( finalRule.getRule().antecedentEquals( chrom ) ){
+                            triggered = true;
+                            if( finalRule.getRule().getEncodedClass().equals( windowClass ) ) {
                                 correct++;
                                 break;
                             }
                         }
                     }
-                    
+                }
+                if( !triggered ) {
+                    if( chrom.getEncodedClass().equals( "00100" ) )
+                        correct++;
                 }
             }
         }
@@ -51,36 +55,37 @@ public class RuleSetEvaluator {
     
     public double calculateError2( List< FinalRule > finalRuleSet, HashMap< String, Window > windows ) {
         
-        double correct = 0.0;
-        double total = 0.0;
+      
+        double numberClass = 0.0;
+        double totalSum = 0.0;
         
-        for( FinalRule finalRule : finalRuleSet ) { 
+        for ( Map.Entry< String, Window > windowMap : windows.entrySet() ) {
+            String windowClass = windowMap.getKey();
+            Window window = windowMap.getValue();
+            numberClass++;
+            double correct = 0.0;
+            double totalClass = window.getChromossomes().size();
             
-            if( finalRule.getConfidence() > 0.7 ) {
-                
-                for ( Map.Entry< String, Window > windowMap : windows.entrySet() ) {
-                    String windowClass = windowMap.getKey();
-                    Window window = windowMap.getValue();
-            
-                        for( Chromossome chrom : window.getChromossomes() ){
-                            
-                            if( finalRule.getRule().antecedentEquals( chrom ) ) {
-                    
-                                total++;
-                                if( finalRule.getRule().getEncodedClass().equals( windowClass ) ) {
-                                    
-                                    correct++;
-                                }
+            for( Chromossome chrom : window.getChromossomes() ){
+                for( FinalRule finalRule : finalRuleSet ) {                
+                    if( finalRule.getConfidence() > 0.0 ) {
+                        if( finalRule.getRule().getEncodedClass().equals( windowClass ) ) {
+                        
+                            if( finalRule.getRule().antecedentEquals( chrom ) ){
+                                correct++;
+                                break;
                             }
                         }
-                    
+                    }
                 }
             }
+            if( totalClass != 0.0 )
+                totalSum += (correct/totalClass);
         }
         
-        double accuracy = correct/total;
+        double averageAccuracy = totalSum / numberClass;
         
-        return (1.0 - accuracy);
+        return (1.0 - averageAccuracy);
         
     }
         
