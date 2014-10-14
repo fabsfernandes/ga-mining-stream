@@ -72,14 +72,6 @@ public class StreamDistributor {
                     }
                     double averageProportion = sum / k;
 
-                    /*if ( averageProportion > 0.5 && window.getCurrentSize().getProportion() < 0.5 ) {
-                        // update window size
-                        window.setCurrentSize( stat );
-                    }
-                    if ( averageProportion < 0.5 && window.getCurrentSize().getProportion() > 0.5 ) {
-                        // update window size
-                        window.setCurrentSize( stat );
-                    }*/
                     if (averageProportion - window.getCurrentSize().getProportion()  > 0.001 ) {
                         // update window size
                         window.setCurrentSize( stat );
@@ -106,25 +98,6 @@ public class StreamDistributor {
             window.getChromossomes().add( chromossome );
         }*/
 
-  //      System.out.println( "== ANTES == " );
-        Window window2 = windows.get( "00100");
-        /*for( Chromossome c : window2.getChromossomes() ){
-            System.out.println( c.toStringEncoded() );
-        }*/
- //       System.out.println( " TOTAL ANTES = " + window2.getChromossomes().size() );
-        
-  //      System.out.println("== LIDOS ==");
-        int total = 0;
-        for ( Chromossome chromossome : chromossomes ) {
-            if( chromossome.getEncodedClass().equals( "00100" ) ){
-                //System.out.println( chromossome.toStringEncoded() );
-                total++;
-            }
-        }
-  //      System.out.println( " TOTAL LIDOS = " + total );
-        
-        
-        
         for ( Chromossome chromossome : chromossomes ) {
             
             Window window = windows.get( chromossome.getEncodedClass() );
@@ -137,20 +110,10 @@ public class StreamDistributor {
             List< Chromossome > chroms = window.getChromossomes();
             
             for( ;window.getCurrentSize().getSize() < chroms.size();   ){
-                //if( window.getEncodedClass().equals( "10000" ))
-                //System.out.println( "Remove: " + chroms.get( 0 ).toStringEncoded() );
                 chroms.remove( 0 );
             }
             
         }
-        
- //       System.out.println( "== RESULTADO == " );
-        Window window3 = windows.get( "00100");
-        for( Chromossome c : window3.getChromossomes() ){
-            //System.out.println( c.toStringEncoded() );
-        }
-  //      System.out.println( " TOTAL RESULTADO = " + window3.getChromossomes().size() );
-
     }
 
 }
