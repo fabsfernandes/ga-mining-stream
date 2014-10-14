@@ -30,7 +30,7 @@ public class RuleSetEvaluator {
             for( Chromossome chrom : window.getChromossomes() ){
                 boolean triggered = false;
                 for( FinalRule finalRule : finalRuleSet ) {    
-                    if( finalRule.getConfidence() > 0.3 ) {
+                    if( finalRule.getConfidence() > 0.7 ) {
                         if( finalRule.getRule().antecedentEquals( chrom ) ){
                             triggered = true;
                             if( finalRule.getRule().getEncodedClass().equals( windowClass ) ) {

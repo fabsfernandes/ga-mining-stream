@@ -39,10 +39,10 @@ public class Main {
     public void run() {
 
         int index = 0;
-        int conceptDrift = 50000;
+        int conceptDrift = 50000; //100000;
         int errorCalc = 5000;
         
-        List<String> lines = streamGenerator.buildDataset( 205000 );
+        List<String> lines = streamGenerator.buildDataset( 205000 );//405000 );
 
         streamDistributor.initializeWindows( windows, NurseryDataset.encodedClasses );
         
@@ -65,9 +65,6 @@ public class Main {
             
             if( conceptDriftCounter > conceptDrift ) {
                 
-                //System.out.println( "*****************************************");
-                //System.out.println( " CONCEPT DRIFT ");
-                //System.out.println( "*****************************************");
                 conceptDriftCounter = 0;
                 
                 int att1 = RandomGenerator.randInt( 0, NurseryDataset.numberNonClassAttributes-1 );
@@ -84,7 +81,6 @@ public class Main {
                 while( att5 == att1 || att5 == att2 || att5 == att3 || att5 == att4 )
                     att5 = RandomGenerator.randInt( 0, NurseryDataset.numberNonClassAttributes-1 );
                 
-                //System.out.println( "Attributes: " + att1 + "," + att2 + "," + att3);
                 /*streamGenerator.conceptDriftOnAttribute( lines, 0 );
                 streamGenerator.conceptDriftOnAttribute( lines, 1 );
                 streamGenerator.conceptDriftOnAttribute( lines, 2 );
@@ -97,13 +93,8 @@ public class Main {
                 streamGenerator.conceptDriftOnAttribute( lines, att1 );
                 streamGenerator.conceptDriftOnAttribute( lines, att2 );
                 streamGenerator.conceptDriftOnAttribute( lines, att3 );
-                
-                
-                
-                
             }
-            
-            //System.out.println( conceptDriftCounter + " " + records.size());
+           
             
             records = streamGenerator.readChunkSequence( lines, index, 300 );
             if( records == null )
@@ -124,20 +115,22 @@ public class Main {
             geneticEngine.findRule( ruleSets, windows, 0.7, 0.3 );
             
             ruleSetEvaluator.handleFinalRuleSet( ruleSets, finalRuleSet, windows );
-            
-            //System.out.println( "Final Set");
-            //for( FinalRule finalRule : finalRuleSet )
-            //    System.out.println( finalRule + " " + finalRule.getRule().getFitness() );
-            
+                        
         }
-        //System.out.println( "=======Final Set");
+        System.out.println( "======= Final Rule Set =======");
         int cont = 0;
         for( FinalRule finalRule : finalRuleSet ) {
-            if( finalRule.getConfidence() > 0.7 )
+            if( finalRule.getConfidence() > 0.7 && finalRule.getSupport() > 0.05 ) {
                 cont++;
-              //  System.out.println( finalRule );
+                System.out.println( finalRule );
+            }
+            
         }
         //System.out.println( cont );
+        System.out.println();
+        
+        System.out.println( "======= Total time ======= " );
+        System.out.println( (System.currentTimeMillis() - init ) + " ms" );
     }
 
     public static void main( String... args ) {
